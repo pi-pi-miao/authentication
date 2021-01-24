@@ -77,8 +77,13 @@ func Identification(c *gin.Context){
 		return
 	}
 
-	sha.GetSha256(fmt.Sprintf("%v%v",config.Salt,user.Uid),token[len(token)-2:len(token)-1],token[len(token)-1:len(token)],token[len(token)-12:len(token)-2])
-
+	rightToken := sha.GetSha256(fmt.Sprintf("%v%v",config.Salt,user.Uid),token[len(token)-2:len(token)-1],token[len(token)-1:len(token)],token[len(token)-12:len(token)-2])
+	if token != rightToken {
+		log.Println("[Identification] unmarshal request body",err)
+		c.JSON(http.StatusUnauthorized,gin.H{"status": "unauthorized"})
+		c.Abort()
+		return
+	}
 
 	c.Next()
 }
